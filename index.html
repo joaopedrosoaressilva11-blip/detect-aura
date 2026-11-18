@@ -1,1 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuraScan | Descubra o que você é</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #f8fafc;
+        }
+
+        .container {
+            background: rgba(30, 41, 59, 0.78);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 38px 28px;
+            width: 100%;
+            max-width: 430px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65);
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.2);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 25px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ffffff, #c4b5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 26px;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 2px solid #334155;
+            background: #0f172a;
+            color: #ffffff;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+        }
+
+        .helper-text {
+            display: block;
+            color: #94a3b8;
+            font-size: 12.5px;
+            margin-top: 7px;
+            font-style: italic;
+        }
+
+        .error-msg {
+            color: #f87171;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+            font-weight: 600;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #7c3aed, #db2777);
+            color: white;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 10px 20px -5px rgba(124, 58, 237, 0.5);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -5px rgba(124, 58, 237, 0.7);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+                /* Tela de Suspense */
+        .loading-box {
+            display: none;
+            padding: 25px 0;
+        }
+
+        .spinner {
+            width: 52px;
+            height: 52px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #a855f7;
+            border-radius: 50%;
+            margin: 0 auto 18px;
+            animation: spin 0.9s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            color: #e2e8f0;
+            font-weight: 500;
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Tela de Resultado */
+        .result-box {
+            display: none;
+            margin-top: 10px;
+            padding: 24px 18px;
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(168, 85, 247, 0.45);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .result-label {
+            font-size: 13px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .result-text {
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1.4;
+            color: #f8fafc;
+        }
+
+        .highlight-aura {
+            background: linear-gradient(to right, #facc15, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .highlight-zoeira {
+            color: #fb7185;
+        }
+
+        .btn-reset {
+            margin-top: 22px;
+            background: #334155;
+            box-shadow: none;
+            font-size: 14px;
+            padding: 12px;
+        }
+
+        .btn-reset:hover {
+            background: #475569;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="badge">Análise de Aura</div>
+        <h1>Coloque seu nome e veja o que você é</h1>
+        <p class="subtitle">Nosso sistema analisa a energia e a personalidade do seu nome em segundos.</p>
+
+        <!-- Formulário inicial -->
+        <div id="form-area">
+            <div class="input-group">
+                <label for="nomeInput">Seu nome:</label>
+                <input type="text" id="nomeInput" placeholder="Digite seu nome..." autocomplete="off">
+                <span class="helper-text">Coloque o nome escrevido do jeito certo</span>
+                <div class="error-msg" id="errorMsg">⚠️ Você precisa colocar seu nome antes de clicar em Ver!</div>
+            </div>
+            <button onclick="analisarNome()">Ver</button>
+        </div>
+
+        <!-- Animação de suspense -->
+        <div class="loading-box" id="loadingArea">
+            <div class="spinner"></div>
+            <div class="loading-text" id="loadingText">Lendo padrões do nome...</div>
+        </div>
+
+        <!-- Resultado final -->
+        <div class="result-box" id="resultArea">
+            <div class="result-label" id="resultNome">Resultado:</div>
+            <div class="result-text" id="resultText"></div>
+            <button class="btn-reset" onclick="resetar()">Testar outro nome</button>
+        </div>
+    </div>
+
+    <script>
+        function normalizarTexto(texto) {
+            return texto
+                .trim()
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+        }
+
+        document.getElementById("nomeInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                analisarNome();
+            }
+        });
+
+        function analisarNome() {
+            const input = document.getElementById("nomeInput");
+            const errorMsg = document.getElementById("errorMsg");
+            const nomeOriginal = input.value.trim();
+
+            if (nomeOriginal === "") {
+                errorMsg.style.display = "block";
+                input.focus();
+                return;
+            }
+
+            errorMsg.style.display = "none";
+            const nomeLimpo = normalizarTexto(nomeOriginal);
+
+            document.getElementById("form-area").style.display = "none";
+            const loadingArea = document.getElementById("loadingArea");
+            const loadingText = document.getElementById("loadingText");
+            loadingArea.style.display = "block";
+
+            loadingText.innerText = "Analisando sua aura...";
+            setTimeout(() => {
+                loadingText.innerText = "Calculando nível de personalidade...";
+            }, 900);
+            setTimeout(() => {
+                loadingText.innerText = "Resultado encontrado!";
+            }, 1800);
+
+            setTimeout(() => {
+                loadingArea.style.display = "none";
+                mostrarResultado(nomeOriginal, nomeLimpo);
+            }, 2500);
+        }
+
+        function mostrarResultado(nomeOriginal, nomeLimpo) {
+            const resultArea = document.getElementById("resultArea");
+            const resultNome = document.getElementById("resultNome");
+            const resultText = document.getElementById("resultText");
+
+            resultNome.innerText = `${nomeOriginal}, você é:`;
+            resultText.className = "result-text";
+
+            if (nomeLimpo === "joao" || nomeLimpo === "joao pedro") {
+                resultText.innerText = "Pessoa mais legal do mundo e com Muita aura.";
+                resultText.classList.add("highlight-aura");
+            } 
+            else if (
+                nomeLimpo.includes("nicole") || 
+                nomeLimpo.includes("nichole") || 
+                nomeLimpo.includes("nikole") || 
+                nomeLimpo.includes("nicolly") || 
+                nomeLimpo.includes("nicolle") || 
+                nomeLimpo.includes("nicoly")
+            ) {
+                resultText.innerText = "Muito betinha e sem aura";
+                resultText.classList.add("highlight-zoeira");
+            } 
+            else if (nomeLimpo === "wallace") {
+                resultText.innerText = "um cara legal";
+            } 
+            else if (nomeLimpo === "jean") {
+                resultText.innerText = "UMA PESSOA MUITO LEGAL";
+            } 
+            else if (nomeLimpo === "anna sophia") {
+                resultText.innerText = "louca e Betinha";
+                resultText.classList.add("highlight-zoeira");
+            } 
+            else {
+                resultText.innerText = "Uma pessoa normal com aura comum.";
+            }
+
+            resultArea.style.display = "block";
+        }
+
+        function resetar() {
+            document.getElementById("nomeInput").value = "";
+            document.getElementById("resultArea").style.display = "none";
+            document.getElementById("form-area").style.display = "block";
+        }
+    </script>
+
+</body>
+</html>
 
